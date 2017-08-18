@@ -9,6 +9,8 @@ set(SOURCE_FILES main.cpp Lorenz.h Lorenz.cpp FifoAudioSource.cpp FifoAudioSourc
 
 add_executable(mvis ${SOURCE_FILES})
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+
 target_link_libraries(mvis GL GLEW glfw assimp SOIL freetype k5)
 
 add_custom_command(TARGET mvis POST_BUILD
