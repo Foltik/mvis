@@ -37,12 +37,12 @@ private:
 
     void execute();
 
-    size_t numPts = (44100 / 60) * 100;
-    float* pts = new float[(44100 / 60) * 100 * 5];
+    size_t numPts = (44100 / 60) * 300;
+    float* pts = new float[numPts * 5];
 
     GLuint vao;
     GLuint vbo;
 
     Shader shader = Shader("shaders/shader.vert", "shaders/shader.frag");
-    glm::mat4 proj = glm::ortho(0.0f, 1600.0f, 900.0f, 0.0f, -1.0f, 1.0f);
+    glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(engine->wndW), static_cast<float>(engine->wndH), 0.0f, -1.0f, 1.0f);
 };

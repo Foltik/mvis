@@ -9,8 +9,8 @@ void Lorenz::Init(CEngine *e) {
     glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, (44100 / 60) * 5 * 100 * sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
-    glBufferData(GL_ARRAY_BUFFER, (44100 / 60) * 5 * 100 * sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, (44100 / 60) * 5 * 1000 * sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, (44100 / 60) * 5 * 1000 * sizeof(GLfloat), nullptr, GL_DYNAMIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
@@ -27,7 +27,10 @@ void Lorenz::Cleanup() {
 void Lorenz::Pause() {}
 void Lorenz::Resume() {}
 
-void Lorenz::ProcessInput(bool *keyboard, bool *mouse, double mxpos, double mypos) {}
+void Lorenz::ProcessInput(bool *keyboard, bool *mouse, double mxpos, double mypos) {
+    if (keyboard[GLFW_KEY_Q] || keyboard[GLFW_KEY_ESCAPE])
+        engine->Quit();
+}
 
 void Lorenz::Loop() {
     audioSource.read(audioBuffer, 44100 / 60);
@@ -35,7 +38,7 @@ void Lorenz::Loop() {
 }
 
 void Lorenz::Render() {
-    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shader.Use();
@@ -92,8 +95,9 @@ int colors[31] = {
 
 void getColor(size_t colorDist, float& r, float& g, float& b) {
     bool wrap = true;
-    size_t idx = (colorDist * sizeof(colors)) / (800);
-    auto color = colors[wrap ? idx % sizeof(colors) : std::min(idx, sizeof(colors) - 1)];
+    size_t max = 300;
+    size_t idx = static_cast<size_t>(((double)colorDist / (double)max) * 31);
+    auto color = colors[wrap ? idx : std::min(idx, (size_t)31 - 1)];
     r = ((color >> 8) & 0xFF) / 255.0f;
     g = ((color >> 4) & 0xFF) / 255.0f;
     b = ((color >> 0) & 0xFF) / 255.0f;
@@ -154,7 +158,7 @@ void Lorenz::execute() {
     double y0 = 0.0;
     double z0 = 0.0;
 
-    for (int i = 0; i < samples * 100; i++) {
+    for (int i = 0; i < samples * 300; i++) {
         double x1 = x0 + dt * sigma * (y0 - x0);
         double y1 = y0 + dt * (x0 * (rho - z0) - y0);
         double z1 = z0 + dt * (x0 * y0 - beta * z0);
@@ -166,6 +170,7 @@ void Lorenz::execute() {
         double dist2 = std::sqrt(std::pow(x0 + equilibria, 2) + std::pow(y0 + equilibria, 2) + std::pow(z0 - zCenter, 2));
 
         size_t colorDist = static_cast<size_t>(std::min(dist1, dist2));
+
         float r, g, b;
         getColor(colorDist, r, g, b);
 
