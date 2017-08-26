@@ -29,19 +29,29 @@ protected:
     void operator=(Lorenz&&) = delete;
 
 private:
-    FifoAudioSource audioSource = FifoAudioSource("/tmp/mpd.fifo");
-    AudioBuffer* audioBuffer = nullptr;
-
+	bool test = true;
+	void getColor(size_t colorDist, float& r, float& g, float& b);
+	void execute();
+    
     int rotCountR;
     int rotCountL;
 
-    void execute();
+	const static size_t m_samples = 44100;
+	const static size_t m_framerate = 60;
+    const static size_t m_numDataPts = (m_samples / m_framerate) * 300;
 
-    size_t numPts = (44100 / 60) * 300;
-    float* pts = new float[numPts * 5];
+	// 2 floats for X, Y
+	// 3 floats for R, G, B
+	const static size_t m_szDataPt = 5;
+	const static size_t m_szData = m_numDataPts * m_szDataPt;
+	const static  size_t m_szDataBytes = m_szData * sizeof(float);
+ 	static float m_data[m_szData];
 
     GLuint vao;
     GLuint vbo;
+
+	FifoAudioSource audioSource = FifoAudioSource("/tmp/mpd.fifo");
+    AudioBuffer audioBuffer[m_samples / m_framerate];
 
     Shader shader = Shader("shaders/shader.vert", "shaders/shader.frag");
     glm::mat4 proj = glm::ortho(0.0f, static_cast<float>(engine->wndW), static_cast<float>(engine->wndH), 0.0f, -1.0f, 1.0f);
