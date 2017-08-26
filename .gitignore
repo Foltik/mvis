@@ -1,5 +1,13 @@
 # CLion
-
 cmake-build-release/
 cmake-build-debug/
 .idea/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+
+# Binary
+mvis
